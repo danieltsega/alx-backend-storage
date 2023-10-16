@@ -1,4 +1,4 @@
-# NOSQL Learning Project
+# NOSQL
 
 ## Overview
 
