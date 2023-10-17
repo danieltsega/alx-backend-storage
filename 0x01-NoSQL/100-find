@@ -1,0 +1,2 @@
+//List documents by starting option
+db.school.find({name: {$regex: /^Holberton/}});
