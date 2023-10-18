@@ -44,7 +44,7 @@ def call_history(method: Callable) -> Callable:
 
     @wraps(method)
     def wrapper(self, *args, **kwargs):
-        """ 
+        """
         Wrap
         """
 
@@ -54,6 +54,7 @@ def call_history(method: Callable) -> Callable:
         return res
 
     return wrapper
+
 
 def replay(redis_client, method):
     """
