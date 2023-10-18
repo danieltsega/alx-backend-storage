@@ -57,8 +57,9 @@ def call_history(method: Callable) -> Callable:
 
 def replay(redis_client, method):
     """
-    Display the history of calls of a particular function.
+    Display the history of calls.
     """
+
     key = method.__qualname__
     i = "".join([key, ":inputs"])
     o = "".join([key, ":outputs"])
