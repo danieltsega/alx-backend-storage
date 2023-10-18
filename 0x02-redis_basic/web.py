@@ -1,44 +1,42 @@
 #!/usr/bin/env python3
-""" 
+"""
 Expiring Web Cache
 """
 
-
 import redis
 import requests
-from typing import Callable
 from functools import wraps
 
-redis = redis.Redis()
+r = redis.Redis()
 
 
-def wrap_requests(fn: Callable) -> Callable:
-    """
-    Decorator wrapper
-    """
-
-    @wraps(fn)
+def url_access_count(method):
+    """decorator for get_page function"""
+    @wraps(method)
     def wrapper(url):
-        """ 
-        Wrapper
-        """
+        """wrapper function"""
+        key = "cached:" + url
+        cached_value = r.get(key)
+        if cached_value:
+            return cached_value.decode("utf-8")
 
-        redis.incr(f"count:{url}")
-        cached_response = redis.get(f"cached:{url}")
-        if cached_response:
-            return cached_response.decode('utf-8')
-        result = fn(url)
-        redis.setex(f"cached:{url}", 10, result)
-        return result
+            # Get new content and update cache
+        key_count = "count:" + url
+        html_content = method(url)
 
+        r.incr(key_count)
+        r.set(key, html_content, ex=10)
+        r.expire(key, 10)
+        return html_content
     return wrapper
 
 
-@wrap_requests
+@url_access_count
 def get_page(url: str) -> str:
-    """
-    Get page
-    """
+    """obtain the HTML content of a particular"""
+    results = requests.get(url)
+    return results.text
 
-    response = requests.get(url)
-    return response.text
+
+if __name__ == "__main__":
+    get_page('http://slowwly.robertomurray.co.uk')
